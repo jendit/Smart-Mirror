@@ -328,6 +328,7 @@ class MyAssistant(Frame):
         self._assistant = None
         self.lastStatus = 'nothing yet'
         self.lastStatusTime = time.time()
+        self.showStatus = True
         self.start()
 
     def aiyStatusUpdate(self):
@@ -336,16 +337,19 @@ class MyAssistant(Frame):
         if self.lastStatus != self._updateStatus:
             self.lastStatusTime = time.time()
             self.lastStatus = self._updateStatus
+            self.showStatus = True
 
-        if time.time() - self.lastStatusTime < 15:
-            if "I am listening" in self._updateStatus:
+        if time.time() - self.lastStatusTime < 5:
+            if "I am listening" in self._updateStatus and self.showStatus is True:
                 self.stateTxt.delete(1.0, END)
-            self.stateTxt.insert(INSERT, self._updateStatus, 'centered')
-            self._updateStatus = ''
+            if self.showStatus is True:
+                self.stateTxt.insert(INSERT, self._updateStatus, 'centered')
+                self.showStatus = False
             self.faceLbl.configure(image = self.faceReal)
-        else:
+        elif "I am ready (OK Google)" in self._updateStatus:
             self.stateTxt.delete(1.0, END)
             self.faceLbl.configure(image = self.faceBlack)
+            self.showStatus = True
         
         self.after(200, self.aiyStatusUpdate)
 
@@ -374,7 +378,7 @@ class MyAssistant(Frame):
             if sys.stdout.isatty():
                 print('Say "OK, Google" or press the button, then speak. '
                       'Press Ctrl+C to quit...')
-                self._updateStatus = 'OK Google - bereit\n'
+                self._updateStatus = 'I am ready (OK Google)\n'
 
         elif event.type == EventType.ON_CONVERSATION_TURN_STARTED:
             self._can_start_conversation = False
@@ -393,7 +397,7 @@ class MyAssistant(Frame):
 
         elif event.type == EventType.ON_CONVERSATION_TURN_FINISHED:
             status_ui.status('ready')
-            self._updateStatus = 'I am ready\n'
+            self._updateStatus = 'I am ready (OK Google)\n'
             self._can_start_conversation = True
 
         elif event.type == EventType.ON_ASSISTANT_ERROR and event.args and event.args['is_fatal']:
