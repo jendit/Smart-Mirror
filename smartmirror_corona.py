@@ -277,11 +277,11 @@ class Corona(Frame):
         if corona_numbers_dict:
             for k, v in corona_numbers_dict.items():
                 if k in ('Bayern'):
-                    c_values = f"Infektionen: \t\t\t{v[0]}\nDifferenz zum Vortag: \t\t\t{v[1]}\nTodesfälle: \t\t\t{v[2]}"
+                    c_values = "Infektionen: \t\t\t{}\nDifferenz zum Vortag: \t\t\t{}\nTodesfälle: \t\t\t{}".format(v[0], v[1], v[2])
                     corona_numbers = CoronaNumbers(self.coronaNumbersContainer, f"{k}:\n{c_values}")
                     corona_numbers.pack(side=TOP, anchor=W)
                 if k in ('Gesamt'):
-                    c_values = f"Infektionen: \t\t\t{v[0]}\nDifferenz zum Vortag: \t\t\t{v[1]}\nTodesfälle: \t\t\t{v[2]}"
+                    c_values = "Infektionen: \t\t\t{}\nDifferenz zum Vortag: \t\t\t{}\nTodesfälle: \t\t\t{}".format(v[0], v[1], v[2])
                     corona_numbers = CoronaNumbers(self.coronaNumbersContainer, f"Deutschland: \n{c_values}")
                     corona_numbers.pack(side=TOP, anchor=W)
 
