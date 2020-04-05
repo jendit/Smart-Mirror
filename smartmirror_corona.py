@@ -301,7 +301,7 @@ class Corona(Frame):
         corona_table = soup.select('#main > div.text > table > tbody')[0]
         for tr in corona_table:
             tds = tr.find_all('td')
-            corona_dict[tds[0].text] = [tds[1].text, tds[2].text, tds[3].text]
+            corona_dict[tds[0].text] = [tds[1].text, tds[2].text, tds[4].text]
         return corona_dict
 
 
