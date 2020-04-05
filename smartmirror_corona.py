@@ -278,16 +278,16 @@ class Corona(Frame):
             for k, v in corona_numbers_dict.items():
                 if k in ('Bayern'):
                     c_values = "Infektionen: \t\t\t{}\nDifferenz zum Vortag: \t\t\t{}\nTodesfälle: \t\t\t{}".format(v[0], v[1], v[2])
-                    corona_numbers = CoronaNumbers(self.coronaNumbersContainer, f"{k}:\n{c_values}")
+                    corona_numbers = CoronaNumbers(self.coronaNumbersContainer, "{}:\n{}".format(k, c_values))
                     corona_numbers.pack(side=TOP, anchor=W)
                 if k in ('Gesamt'):
                     c_values = "Infektionen: \t\t\t{}\nDifferenz zum Vortag: \t\t\t{}\nTodesfälle: \t\t\t{}".format(v[0], v[1], v[2])
-                    corona_numbers = CoronaNumbers(self.coronaNumbersContainer, f"Deutschland: \n{c_values}")
+                    corona_numbers = CoronaNumbers(self.coronaNumbersContainer, "Deutschland: \n{}".format(c_values))
                     corona_numbers.pack(side=TOP, anchor=W)
 
             for k, v in corona_numbers_dict.items():
                 if k in ('Datum'):
-                    corona_numbers = CoronaNumbers(self.coronaNumbersContainer, f"{k}: {v}")
+                    corona_numbers = CoronaNumbers(self.coronaNumbersContainer, "{}: {}".format(k, v))
                     corona_numbers.pack(side=TOP, anchor=W)
 
     def get_corona_numbers(self):
