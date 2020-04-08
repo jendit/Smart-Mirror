@@ -265,7 +265,6 @@ class Corona(Frame):
     """Corona-Virus information.
     """
     def __init__(self, parent, *args, **kwargs):
-        self.url = "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html"
         Frame.__init__(self, parent, *args, **kwargs)
         self.config(bg='black')
         self.title = 'Corona'
@@ -273,43 +272,51 @@ class Corona(Frame):
         self.coronaLbl.pack(side=TOP, anchor=W)
         self.coronaNumbersContainer = Frame(self, bg="black")
         self.coronaNumbersContainer.pack(side=TOP)
-        corona_numbers_dict = self.get_corona_numbers()
-        if corona_numbers_dict:
-            for k, v in corona_numbers_dict.items():
-                if k in ('Bayern'):
-                    c_values = "Infektionen: \t\t\t{}\nDifferenz zum Vortag: \t\t\t{}\nTodesfälle: \t\t\t{}".format(v[0], v[1], v[2])
-                    corona_numbers = CoronaNumbers(self.coronaNumbersContainer, "{}:\n{}".format(k, c_values))
-                    corona_numbers.pack(side=TOP, anchor=W)
-                if k in ('Gesamt'):
-                    c_values = "Infektionen: \t\t\t{}\nDifferenz zum Vortag: \t\t\t{}\nTodesfälle: \t\t\t{}".format(v[0], v[1], v[2])
-                    corona_numbers = CoronaNumbers(self.coronaNumbersContainer, "Deutschland: \n{}".format(c_values))
-                    corona_numbers.pack(side=TOP, anchor=W)
-
-            for k, v in corona_numbers_dict.items():
-                if k in ('Datum'):
-                    corona_numbers = CoronaNumbers(self.coronaNumbersContainer, "{}: {}".format(k, v))
-                    corona_numbers.pack(side=TOP, anchor=W)
+        self.get_corona_numbers()
 
     def get_corona_numbers(self):
-        res = requests.get(self.url)
-        if res.status_code != requests.codes.ok:
-            return None
-        soup = bs4.BeautifulSoup(res.text, "html.parser")
-        date = soup.select('#main > div.text > p:nth-child(4)')[0].text
-        corona_dict = {}
-        corona_dict["Datum"] = date
-        corona_table = soup.select('#main > div.text > table > tbody')[0]
-        for tr in corona_table:
-            tds = tr.find_all('td')
-            corona_dict[tds[0].text] = [tds[1].text, tds[2].text, tds[4].text]
-        return corona_dict
+        try:
+            corona_url = "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html"
+            res = requests.get(corona_url)
+            soup = bs4.BeautifulSoup(res.text, "html.parser")
+            date = soup.select('#main > div.text > p:nth-child(4)')[0].text
+            corona_dict = {}
+            corona_dict["Datum"] = date
+            corona_table = soup.select('#main > div.text > table > tbody')[0]
+            corona_update_date = ""
+            corona_bayern = ""
+            corona_germany = ""
+            for tr in corona_table:
+                tds = tr.find_all('td')
+                corona_dict[tds[0].text] = [tds[1].text, tds[2].text, tds[4].text]
+
+            if corona_dict:
+                for k, v in corona_dict.items():
+                    if k in ('Bayern'):
+                        c_values = "Infektionen: \t\t\t{}\nDifferenz zum Vortag: \t\t\t{}\nTodesfälle: \t\t\t{}".format(
+                            v[0], v[1], v[2])
+                        corona_bayern += "{}:\n{}".format(k, c_values)
+                    if k in ('Gesamt'):
+                        c_values = "Infektionen: \t\t\t{}\nDifferenz zum Vortag: \t\t\t{}\nTodesfälle: \t\t\t{}".format(
+                            v[0], v[1], v[2])
+                        corona_germany += "Deutschland: \n{}".format(c_values)
+                    if k in ('Datum'):
+                        corona_update_date += "{}: {}".format(k, v)
+
+            corona_numbers = CoronaNumbers(self.coronaNumbersContainer, "{}\n\n{}\n\n{}".format(corona_bayern, corona_germany, corona_update_date))
+            corona_numbers.pack(side=TOP, anchor=W)
+
+        except Exception as e:
+            traceback.print_exc()
+            print("Error: {}. Cannot get corona numbers.".format(e))
+
+        self.after(600000, self.get_corona_numbers)
 
 
 class CoronaNumbers(Frame):
     def __init__(self, parent, event_name=""):
         Frame.__init__(self, parent, bg='black')
-
-        self.eventNameTxt = Text(self, font=('Helvetica', small_text_size), wrap=WORD, height=5, fg="white", bg="black", borderwidth=0, highlightthickness=0)
+        self.eventNameTxt = Text(self, font=('Helvetica', small_text_size), wrap=WORD, height=11, fg="white", bg="black", borderwidth=0, highlightthickness=0)
         self.eventNameTxt.pack(side=LEFT, anchor=N)
         self.eventNameTxt.delete(1.0, END)
         self.eventNameTxt.insert(INSERT, event_name)
