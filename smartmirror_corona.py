@@ -276,6 +276,11 @@ class Corona(Frame):
 
     def get_corona_numbers(self):
         try:
+            # remove all children
+            for widget in self.coronaNumbersContainer.winfo_children():
+                widget.destroy()
+
+
             corona_url = "https://www.rki.de/DE/Content/InfAZ/N/Neuartiges_Coronavirus/Fallzahlen.html"
             res = requests.get(corona_url)
             soup = bs4.BeautifulSoup(res.text, "html.parser")
